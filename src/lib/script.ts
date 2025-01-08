@@ -2,39 +2,67 @@
 // bun add @xenova/transformers pg pdf-parse dotenv
 
 import { pipeline } from '@xenova/transformers';
-import { Pool } from 'pg';
+import pkg from 'pg';
 import * as pdfParse from 'pdf-parse';
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
+import { POSTGRES_PASSWORD} from '$env/static/private';
 
 dotenv.config();
 
 // PostgreSQL configuration
+const { Pool } = pkg;
 const pool = new Pool({
   user: process.env.POSTGRES_USER,
   host: process.env.POSTGRES_HOST,
   database: process.env.POSTGRES_DB,
   password: process.env.POSTGRES_PASSWORD,
   port: parseInt(process.env.POSTGRES_PORT || '5432'),
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Initialize the embedding pipeline
 let embedder:any = null;
 
+function chunkText(text:string, maxChunkLength = 512) {
+  // Split into sentences (basic implementation)
+  const sentences = text.split(/[.!?]+/);
+  const chunks = [];
+  let currentChunk = '';
+  
+  for (const sentence of sentences) {
+    if ((currentChunk + sentence).length > maxChunkLength && currentChunk.length > 0) {
+      chunks.push(currentChunk.trim());
+      currentChunk = '';
+    }
+    currentChunk += sentence + '. ';
+  }
+  
+  if (currentChunk.trim().length > 0) {
+    chunks.push(currentChunk.trim());
+  }
+  
+  return chunks;
+}
+
 async function initializeEmbedder() {
-  embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+  //embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+  //embedder = await pipeline('feature-extraction', 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2');
+  embedder = await pipeline('feature-extraction', 'intfloat/multilingual-e5-large');
 }
 
 async function createEmbedding(text:string) {
-  if (!embedder) await initializeEmbedder();
+    if (!embedder) await initializeEmbedder();
+    
+    const output = await embedder(text, {
+        pooling: 'mean',
+        normalize: true,
+    });
   
-  const output = await embedder(text, {
-    pooling: 'mean',
-    normalize: true,
-  });
-  
-  return Array.from(output.data);
+    return Array.from(output.data).map(num => Number(num));
 }
 
 async function extractTextFromPDF(filePath:string) {
@@ -82,13 +110,29 @@ async function processFile(filePath:string) {
     const content = await extractTextFromFile(filePath);
     const language = detectLanguage(content);
     const embedding = await createEmbedding(content);
-    
-    // Store in database
-    await pool.query(
-      `INSERT INTO documents (filename, content, embedding, language)
-       VALUES ($1, $2, $3, $4)`,
-      [filename, content, embedding, language]
-    );
+
+    const chunks = chunkText(content);
+
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      const embedding = await createEmbedding(chunk);
+      
+      // Format the embedding array for pgvector
+      const embeddingString = `[${embedding.join(',')}]`;
+      
+      // Store in database using the correct vector syntax
+      await pool.query(
+        `INSERT INTO documents (filename, content, embedding_1, chunk_index)
+         VALUES ($1, $2, $3::vector, $4)`,
+        [filename, chunk, embeddingString, i]
+      );
+      
+      console.log(`Processed ${filename} chunk ${i+1}/${chunks.length} (${language})`);
+    }
+
+
+
     
     console.log(`Processed ${filename} (${language})`);
   } catch (error) {
@@ -96,12 +140,13 @@ async function processFile(filePath:string) {
   }
 }
 
-async function main() {
+export async function main() {
   const folderPath = process.env.DOCUMENTS_FOLDER;
   
   try {
     // Setup database
-    await setupDatabase();
+    
+    //await setupDatabase();
     
     // Get all files in the folder
     const files = await readdir(folderPath || '');
