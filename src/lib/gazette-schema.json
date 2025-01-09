@@ -1,0 +1,12 @@
+{
+    "name": "gazette",
+    "enable_nested_fields": true,
+    "fields": [
+        {"name": "filename", "type": "string"},
+        {"name": "file_url", "type": "string"},
+        {"name": "content", "type": "string"},
+        {"name": "link_url", "type": "string"},
+        {"name": "id", "type": "string"}
+    ]
+
+}
