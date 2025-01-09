@@ -1,5 +1,5 @@
 import { json, error } from '@sveltejs/kit';
-import { semanticSearch, pool } from '$lib/script';
+import { semanticSearch, pool } from '$lib/gazzete';
 
 export const prerender = false;
 

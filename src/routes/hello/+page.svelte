@@ -3,7 +3,7 @@
 let query = '';
 
 async function run() {
-    const response = await fetch('/api/embed', {method: 'POST'});
+    const response = await fetch('/api/process', {method: 'POST'});
 }
 
 async function search() {

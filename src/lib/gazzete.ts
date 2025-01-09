@@ -72,14 +72,14 @@ async function extractTextFromPDF(filePath:string) {
   return data.text;
 }
 
-async function extractTextFromFile(filePath:string) {
-  const ext = path.extname(filePath).toLowerCase();
+export async function extractTextFromFile(filePath:string) {
+    const ext = path.extname(filePath).toLowerCase();
   
-  if (ext === '.pdf') {
-    return await extractTextFromPDF(filePath);
-  } else if (ext === '.txt') {
-    return await readFile(filePath, 'utf8');
-  }
+    if (ext === '.pdf') {
+        return await extractTextFromPDF(filePath);
+    } else if (ext === '.txt') {
+        return await readFile(filePath, 'utf8');
+    }
   
   throw new Error(`Unsupported file type: ${ext}`);
 }
@@ -108,10 +108,28 @@ function detectLanguage(text:string) {
 async function processFile(filePath:string) {
   try {
     const filename = path.basename(filePath);
+    const file_url = 'https://storage.googleapis.com/gazette.gov.mv/docs/gazette/'+filename;
     const content = await extractTextFromFile(filePath);
     const language = detectLanguage(content);
     const embedding = await createEmbedding(content);
 
+
+    const existing =  await pool.query(`SELECT * FROM documents WHERE file_url = $1`, [file_url]);
+
+    if (existing.rows.length > 0) {
+      console.log(`Skipping ${filename} as it already exists`);
+      return;
+    }
+
+    await pool.query(
+      `INSERT INTO documents (filename, content, file_url)
+        VALUES ($1, $2, $3)`,
+      [filename, content, file_url]
+    );
+      
+    
+
+    /*
     const chunks = chunkText(content);
 
 
@@ -131,6 +149,7 @@ async function processFile(filePath:string) {
       
       console.log(`Processed ${filename} chunk ${i+1}/${chunks.length} (${language})`);
     }
+      */
 
 
 
