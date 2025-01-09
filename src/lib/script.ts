@@ -13,7 +13,7 @@ dotenv.config();
 
 // PostgreSQL configuration
 const { Pool } = pkg;
-const pool = new Pool({
+export const pool = new Pool({
   user: process.env.POSTGRES_USER,
   host: process.env.POSTGRES_HOST,
   database: process.env.POSTGRES_DB,
@@ -49,9 +49,10 @@ function chunkText(text:string, maxChunkLength = 512) {
 }
 
 async function initializeEmbedder() {
-  //embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+  embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
   //embedder = await pipeline('feature-extraction', 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2');
-  embedder = await pipeline('feature-extraction', 'intfloat/multilingual-e5-large');
+  //embedder = await pipeline('feature-extraction', 'intfloat/multilingual-e5-large');
+   // embedder = await pipeline('feature-extraction', 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2');
 }
 
 async function createEmbedding(text:string) {
@@ -140,6 +141,51 @@ async function processFile(filePath:string) {
   }
 }
 
+
+
+export async function semanticSearch(query:string, options = {}) {
+  const {
+    limit = 5,
+    similarityThreshold = 0.7,
+    includeContent = true
+  }: any = options;
+  
+  try {
+    // Create embedding for the search query
+    const queryEmbedding = await createEmbedding(query);
+    const queryVector = `[${queryEmbedding.join(',')}]`;
+    
+    // Build the SQL query
+    let sql = `
+      SELECT 
+        filename,
+        ${includeContent ? 'content,' : ''}
+        1 - (embedding_1 <=> $1::vector) as similarity,
+        chunk_index
+      FROM documents
+      WHERE 1 - (embedding_1 <=> $1::vector) > $2
+    `;
+    
+    const params = [queryVector, similarityThreshold];
+    let paramCount = 3;
+    
+   
+    // Add ordering and limit
+    sql += `
+      ORDER BY similarity DESC
+      LIMIT $${paramCount}
+    `;
+    params.push(limit);
+    
+    const result = await pool.query(sql, params);
+    return result.rows;
+  } catch (error) {
+    console.error('Error in semantic search:', error);
+    throw error;
+  }
+}
+
+
 export async function main() {
   const folderPath = process.env.DOCUMENTS_FOLDER;
   
@@ -161,8 +207,6 @@ export async function main() {
   } catch (error) {
     console.error('Error:', error);
   } finally {
-    await pool.end();
+    //await pool.end();
   }
 }
-
-main();
