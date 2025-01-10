@@ -88,29 +88,29 @@ export async function buildIndex()
 
 
 
-    t0 = performance.now();
-    const documents = (await pool.query('SELECT id, filename, file_url, content, link_url FROM documents LIMIT 100')).rows;
-    t1 = performance.now();
-    report.push(log(`[ ${Math.round(t1 - t0)}ms ] Retrieved ${documents.length} documents from database`));
 
 
-
-    t0 = performance.now();
+    const offsets = [0, 100, 200];
     try {
-        response = await tss.collections(collection.name).documents().import(documents, {action: 'create'})
+        
+        for(const offset of offsets){
+            t0 = performance.now();
+            const documents = (await pool.query(`SELECT id, filename, file_url, content, link_url FROM documents LIMIT 100 OFFSET ${offset} `)).rows;
+            t1 = performance.now();
+            report.push(log(`[ ${Math.round(t1 - t0)}ms ] Retrieved ${documents.length} documents from database`));
+
+            response = await tss.collections(collection.name).documents().import(documents, {action: 'create'})
+            report.push(log(`[ ${Math.round(t1 - t0)}ms ] Added ${documents.length} documents to ${collection.name}`));
+        }
     }
     catch(error: any) {
         console.error(`Error indexing: `, error);
     }
 
 
-    console.log('HERE');
-    await tss.collections('gazette').delete();
+    console.log('Setting alias gazette to ', new_collection);
+    //await tss.collections('gazette').delete();
     await tss.aliases().upsert('gazette', {'collection_name': new_collection});
-
-    t1 = performance.now();
-    log(`[ ${Math.round(t1 - t0)}ms ] Imported ${documents.length} documents into ${collection.name}`);
-
 
     report.push(log(`[ ${ new Date().toISOString().substring(0,19)} ] Finished indexing ${collection.name}`));
 
