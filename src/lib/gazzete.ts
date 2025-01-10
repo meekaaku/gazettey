@@ -105,7 +105,7 @@ function detectLanguage(text:string) {
   return dhivehiChars.test(text) ? 'dv' : 'en';
 }
 
-async function processFile(filePath:string) {
+async function extractAndSaveFile(filePath:string) {
   try {
     const filename = path.basename(filePath);
     const file_url = 'https://storage.googleapis.com/gazette.gov.mv/docs/gazette/'+filename;
@@ -205,7 +205,7 @@ export async function semanticSearch(query:string, options = {}) {
 }
 
 
-export async function main() {
+export async function extractAndSaveAllFiles() {
   const folderPath = process.env.DOCUMENTS_FOLDER;
   
   try {
@@ -219,7 +219,7 @@ export async function main() {
     // Process each file
     for (const file of files) {
       const filePath = path.join(folderPath || '', file);
-      await processFile(filePath);
+      await extractAndSaveFile(filePath);
     }
     
     console.log('Processing complete!');

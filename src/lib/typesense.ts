@@ -1,6 +1,10 @@
 import Typesense from 'typesense';
 import fs  from 'fs';
 import  { pool } from './gazzete';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 const tss = new Typesense.Client({
     'nodes': [{
         'host': process.env.TYPESENSE_HOST || 'localhost',
@@ -11,6 +15,13 @@ const tss = new Typesense.Client({
     'apiKey': process.env.TYPESENSE_ADMIN_KEY || '',
     'connectionTimeoutSeconds': 2
 });
+
+console.log({
+    'host': process.env.TYPESENSE_HOST,
+    'port': process.env.TYPESENSE_PORT,
+    'path': process.env.TYPESENSE_PATH,
+    'apiKey': process.env.TYPESENSE_ADMIN_KEY,
+})
 
 function log(message: string) {
     console.log(message);
@@ -29,17 +40,35 @@ export function readJSON(filePath: string): any {
     }
 }
 
-async function  buildIndex()
+export async function buildIndex()
 {
 
     const report = [];
+
+    // First time run stuff
+    if(false){
+        try {
+            const a = await tss.collections('gazette-a').retrieve();
+        } catch(e) {
+            await tss.collections().create(await readJSON('src/lib/gazette-schema.json'));
+            //await tss.aliases().upsert('gazette', {'collection_name': 'gazette-a'});
+        }
+        try {
+            const b = await tss.collections('gazette-b').retrieve();
+        } catch(e) {
+            await tss.collections().create(await readJSON('src/lib/gazette-schema.json'));
+        }
+    }
+
+
     let t0 = performance.now();
+
     report.push(log(`[ ${ new Date().toISOString().substring(0,19)} ] Started indexing`));
 
     let alias, old_collection, new_collection = 'gazette-a';
     try 
     {
-        alias = await tss.aliases('gazette-a').retrieve()
+        alias = await tss.aliases('gazette').retrieve()
         old_collection = alias.collection_name;
         new_collection = old_collection  === 'gazette-a' ? 'gazette-b' : 'gazette-a';
     }
@@ -59,12 +88,8 @@ async function  buildIndex()
 
 
 
-    const privateKey = process.env.JWT_SECRET;
-    if(!privateKey) throw new Error('JWT_SECRET is not set');
-
-
     t0 = performance.now();
-    const documents = (await pool.query('SELECT id, filename, file_url, content, link_url FROM documents LIMIT 10')).rows;
+    const documents = (await pool.query('SELECT id, filename, file_url, content, link_url FROM documents LIMIT 100')).rows;
     t1 = performance.now();
     report.push(log(`[ ${Math.round(t1 - t0)}ms ] Retrieved ${documents.length} documents from database`));
 
@@ -75,23 +100,31 @@ async function  buildIndex()
         response = await tss.collections(collection.name).documents().import(documents, {action: 'create'})
     }
     catch(error: any) {
-        error.importResults.forEach((result: any, index: number) => {
-            if (result.success === false) {
-                console.error(`Error indexing: ${result.error} - ${result.document.sku}`);
-                console.error(`Document: ${JSON.stringify(documents[index])}`);
-            }
-        });
+        console.error(`Error indexing: `, error);
     }
 
-    await tss.aliases().upsert('index-2', {'collection_name': new_collection});
+
+    console.log('HERE');
+    await tss.collections('gazette').delete();
+    await tss.aliases().upsert('gazette', {'collection_name': new_collection});
 
     t1 = performance.now();
     log(`[ ${Math.round(t1 - t0)}ms ] Imported ${documents.length} documents into ${collection.name}`);
 
 
-    report.push(log(`[ ${ new Date().toISOString().substring(0,19)} ] Finished indexing`));
-
+    report.push(log(`[ ${ new Date().toISOString().substring(0,19)} ] Finished indexing ${collection.name}`));
 
     return
 
+}
+
+
+export async function search(q: string) {
+    const searchParams = {  
+        q: q,
+        query_by: 'content',
+        index: 'gazette'
+    }
+    const results = await tss.collections('gazette').documents().search(searchParams);
+    return results;
 }

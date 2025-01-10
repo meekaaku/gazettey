@@ -1,5 +1,5 @@
 import { json, error } from '@sveltejs/kit';
-import { semanticSearch, pool } from '$lib/gazzete';
+import { search } from '$lib/typesense';
 
 export const prerender = false;
 
@@ -14,7 +14,7 @@ export async function POST({ url, request }) {
 
     console.log('querying for ', q)
 
-    const results = await semanticSearch(q);
+    const results = await search(q);
 
     return json(results);
 

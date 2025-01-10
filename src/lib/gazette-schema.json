@@ -5,7 +5,7 @@
         {"name": "filename", "type": "string"},
         {"name": "file_url", "type": "string"},
         {"name": "content", "type": "string"},
-        {"name": "link_url", "type": "string"},
+        {"name": "link_url", "type": "string", "optional": true},
         {"name": "id", "type": "string"}
     ]
 

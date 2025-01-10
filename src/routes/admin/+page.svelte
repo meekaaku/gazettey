@@ -2,8 +2,12 @@
 
 let query = '';
 
-async function run() {
+async function process() {
     const response = await fetch('/api/process', {method: 'POST'});
+}
+
+async function buildIndex() {
+    const response = await fetch('/api/build_index', {method: 'POST'});
 }
 
 async function search() {
@@ -13,11 +17,11 @@ async function search() {
 }
 
 </script>
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-<button onclick={run}>Process Files</button>
+<h1>Gazettey Admin</h1>
+<button onclick={process}>Process Files</button> <br />
+<button onclick={buildIndex}>Build Index</button> <br />
 
 
 
-<input type="text" bind:value={query} />
+<input type="text" bind:value={query} dir="rtl" />
 <button onclick={search}>Search</button>
