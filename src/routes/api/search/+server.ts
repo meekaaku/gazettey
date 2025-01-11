@@ -14,6 +14,7 @@ export async function POST({ url, request }) {
 
     console.log('querying for ', q)
 
+    
     const results = await search(q);
 
     return json(results);
