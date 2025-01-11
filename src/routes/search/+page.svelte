@@ -96,7 +96,9 @@
 
 
 <div class="container mt-4">
-  <h1>Gazettey</h1>
+  <div class="row justify-content-center">
+  <h1 class="text-center">ގެޒެޓޭ</h1>
+  </div>
   <!-- Search Section -->
 
   <div class="row justify-content-center mb-4 sticky-top pt-4">
@@ -132,7 +134,9 @@
                 {#each tsResult.hits as hit}
                 <div class="col-6 col-sm-6 col-md-4 col-xl-3 outer">
                     <div class="inner shadow">
+                    <a href={`/view?file=${hit.document.file_url}`}>
                     <img src={`https://haley.sgp1.cdn.digitaloceanspaces.com/gazettey/${hit.document.filename.replace('.pdf','_1.jpg')}`} class="img-fluid" alt="Gazzete Image">
+                    </a>
                     </div>
                 </div>
 
