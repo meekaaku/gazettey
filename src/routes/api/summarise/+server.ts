@@ -8,7 +8,7 @@ export async function POST({ url, request }) {
 
     try {
 
-        const dbresult = await pool.query('SELECT * FROM documents WHERE content_en IS NULL LIMIT 1');
+        const dbresult = await pool.query('SELECT * FROM documents WHERE content_en IS NULL LIMIT 3');
 
         for (const row of dbresult.rows) {
             // Split content into chunks
@@ -17,14 +17,15 @@ export async function POST({ url, request }) {
             const summary_en = [];
             const summary_dv = [];
 
-            console.log(`Processing ${row.id}, chunks: ${chunks.length}`);
             // Process each chunk
-            let i = 0;
+            let i = 1;
             for (const chunk of chunks) {
                 try {
                     content_en.push(await processChunk(chunk, 'content_en'));
                     summary_en.push(await processChunk(chunk, 'summary_en'));
                     summary_dv.push(await processChunk(chunk, 'summary_dv'));
+                    console.log(`Processed ${row.id}, chunk ${i} of ${chunks.length}`);
+                    i++;
                 }
                 catch(e) {
                     console.error(`Error processing chunk ${i}:`, e);
@@ -76,10 +77,8 @@ export async function POST({ url, request }) {
             });
             */
             await pool.query('UPDATE documents SET content_en = $1, summary_en = $2, summary_dv = $3 WHERE id = $4', [finalContentEn, finalSummaryEn, finalSummaryDv, row.id]);
-
-            return json({message: 'Content summarised', status: 200});
-
         }
+        return json({message: 'Content summarised', status: 200});
     } catch (error: any) {
         console.error('Error processing content:', error);
         return new Response(JSON.stringify({ 
