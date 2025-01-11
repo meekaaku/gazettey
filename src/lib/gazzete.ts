@@ -1,6 +1,8 @@
 // Install required packages:
 // bun add @xenova/transformers pg pdf-parse dotenv
 
+import pdf2img from 'pdf2img';
+import { promises as fs } from 'fs';
 import { pipeline } from '@xenova/transformers';
 import pkg from 'pg';
 import * as pdfParse from 'pdf-parse';
@@ -228,4 +230,102 @@ export async function extractAndSaveAllFiles() {
   } finally {
     //await pool.end();
   }
+}
+
+
+
+async function convertPdfPageToImage(inputPath:string, outputPath:string, options = {}) {
+    try {
+        // Validate input
+        if (!inputPath || !outputPath) {
+            throw new Error('Input and output paths are required');
+        }
+
+        // Default options
+        const defaultOptions = {
+            width: 600,              // Width of output image
+            height: 850,             // Height of output image
+            page: 1,                  // Page number to convert (1-based)
+            quality: 100,             // Image quality (1-100)
+            format: 'jpg'             // Output format
+        };
+
+        // Merge default options with user options
+        const finalOptions = { ...defaultOptions, ...options };
+
+        // Create converter instance
+        //const converter = new pdf2img.PDF2Img();
+        const converter = pdf2img;
+
+        // Configure converter
+        converter.setOptions({
+            type: finalOptions.format,
+            size: finalOptions.width,
+            density: 300,
+            quality: finalOptions.quality,
+            outputdir: path.dirname(outputPath),
+            outputname: path.basename(outputPath, path.extname(outputPath)),
+            page: finalOptions.page
+        });
+
+        // Convert PDF page to image
+        return new Promise((resolve, reject) => {
+            converter.convert(inputPath, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result);
+            });
+        });
+    } catch (error:any) {
+        throw new Error(`Failed to convert PDF: ${error.message}`);
+    }
+}
+
+export async function saveFirstPageToPdf() {
+  const folderPath = process.env.DOCUMENTS_FOLDER;
+  const imageFolderPath = process.env.IMAGE_FOLDER;
+  
+  try {
+    
+    
+    // Get all files in the folder
+    const files = await readdir(folderPath || '');
+    
+    // Process each file
+    for (const file of files) {
+      if(!file.endsWith('.pdf')) continue;
+      const outfile = file.replace('.pdf','.png');
+      const filePath = path.join(folderPath || '', file);
+      const imagePath = path.join(imageFolderPath || '', outfile);
+      console.log({filePath,imagePath});
+      await convertPdfPageToImage(filePath, imagePath);
+    }
+    
+    console.log('Processing complete!');
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    //await pool.end();
+  }
+}
+
+
+// Example usage
+async function main() {
+    try {
+        await convertPdfPageToImage(
+            'input.pdf',
+            'output.png',
+            {
+                width: 800,
+                height: 800,
+                quality: 90
+            }
+        );
+        console.log('PDF page converted successfully!');
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
 }

@@ -4,14 +4,16 @@
 
 
     let thaanaValue = $state('');
-    let searchResults = $state([]);
+    let tsResult = $state<any|null>({});
 
 
-    async function handleSearch() {
+    async function handleSearch(event: any) {
+        event.preventDefault();
         try {
+            tsResult = null;
             const response = await fetch(`/api/search`, {method: 'POST', body: JSON.stringify({q: thaanaValue})});
-            const typsenseResults = await response.json();
-            console.log(typsenseResults);
+            tsResult = await response.json();
+            console.log(tsResult);
         }
         catch(error: any){
             console.error(error);
@@ -94,45 +96,63 @@
 
 
 <div class="container mt-4">
+  <h1>Gazettey</h1>
   <!-- Search Section -->
-  <div class="row justify-content-center mb-4">
+
+  <div class="row justify-content-center mb-4 sticky-top pt-4">
     <div class="col-12 col-md-8 col-lg-6">
+        <form onsubmit={handleSearch}>
       <div class="input-group">
+        <button 
+          class="btn btn-primary btn-lg" 
+          type="submit"
+          onclick={handleSearch}
+        >
+        ހޯދާ
+        </button>       
+
+
         <input 
-          type="text" 
+          type="search" 
           class="form-control form-control-lg" 
-          placeholder="Search..."
+          placeholder="ހޯދާލަދީބަލަ..."
           bind:value={thaanaValue}
           oninput={handleKeyInput}
           dir="rtl"
         >
-        <button 
-          class="btn btn-primary btn-lg" 
-          type="button"
-          onclick={handleSearch}
-        >
-          Search
-        </button>
       </div>
+        </form>
     </div>
   </div>
   <!-- Results Section -->
   <div class="row justify-content-center">
     <div class="col-12 col-md-8">
-      {#if searchResults.length > 0}
-        <div class="list-group">
-          {#each searchResults as result}
-            <div class="list-group-item">
-              <h5 class="mb-1">{result.title}</h5>
-              <p class="mb-1">{result.description}</p>
+      {#if tsResult && tsResult.found > 0}
+            <div class="row">
+                {#each tsResult.hits as hit}
+                <div class="col-6 col-sm-6 col-md-4 col-xl-3 outer">
+                    <div class="inner shadow">
+                    <img src={`https://haley.sgp1.cdn.digitaloceanspaces.com/gazettey/${hit.document.filename.replace('.pdf','_1.jpg')}`} class="img-fluid" alt="Gazzete Image">
+                    </div>
+                </div>
+
+                {/each}
             </div>
-          {/each}
-        </div>
       {:else}
         <div class="text-center text-muted">
-          <p>No results to display. Try searching for something!</p>
+          <p>އެއްވެސް ނަތީޖާއެް ނުފެނުނު</p>
         </div>
       {/if}
     </div>
   </div>
 </div>
+
+
+<style>
+    .outer {
+        padding: 10px;
+    }
+    .inner{
+        border: 1px solid #ccc;
+    }
+</style>

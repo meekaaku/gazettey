@@ -123,7 +123,9 @@ export async function search(q: string) {
     const searchParams = {  
         q: q,
         query_by: 'content',
-        index: 'gazette'
+        index: 'gazette',
+        per_page: 100,
+        exclude_fields: 'content'
     }
     const results = await tss.collections('gazette').documents().search(searchParams);
     return results;
