@@ -5,6 +5,7 @@ export const prerender = false;
 
 export async function POST({ url, request }) {
     //const q = url.searchParams.get('q') ?? null;
+    return json({message: 'dummy results', results: {}});
     const body = await request.json();
     const q = body.q ?? null;
 
@@ -16,7 +17,6 @@ export async function POST({ url, request }) {
 
     
     try {
-        return json({message: 'dummy results', results: {}});
         const results = await search(q);
         //return json({message: 'dummy results', results: results});
         return json(results);
