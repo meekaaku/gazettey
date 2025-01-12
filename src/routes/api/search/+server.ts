@@ -17,11 +17,11 @@ export async function POST({ url, request }) {
     
     try {
         const results = await search(q);
-        //return json({message: 'dummy results', results: results});
+        return json({message: 'Gor results from typesnse', results: results});
         return json(results);
     }
     catch(error: any) {
-        return json({message: error.message, detail: JSON.stringify(error), status: 500 });
+        return json({message: error.message, status: 500 });
     }
         
 
