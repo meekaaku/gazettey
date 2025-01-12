@@ -15,8 +15,14 @@ export async function POST({ url, request }) {
     console.log('querying for ', q)
 
     
-    const results = await search(q);
+    try {
+        const results = await search(q);
+        return json(results);
+    }
+    catch(error: any) {
+        return json({message: error.message, status: 500 });
+    }
+        
 
-    return json(results);
 
 };
