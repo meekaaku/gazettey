@@ -11,7 +11,9 @@
         currentTab = 'canvas';
         pdfjsLib.getDocument(data.pdfData).promise.then(function(pdf: any) {
             pdfDoc = pdf;
-            renderPage(currentPage);  // Initially render the first page
+            renderPage(1);  // Initially render the first page
+            renderPage(2)
+            currentPage = 2;
 
             const pdfContainer = document.getElementById('pdf-container');
             pdfContainer?.addEventListener('scroll', onScroll);
@@ -39,7 +41,7 @@
         pdfDoc.getPage(pageNum).then(function(page: any) {
           const canvas = document.createElement('canvas');
           const context = canvas.getContext('2d');
-          const viewport = page.getViewport({ scale: 1.5 });
+          const viewport = page.getViewport({ scale: 0.75 });
 
           canvas.height = viewport.height;
           canvas.width = viewport.width;
@@ -57,6 +59,7 @@
 
       // Handle scrolling to load next pages dynamically
       function onScroll() {
+        console.log('onScroll');
         const container = document.getElementById('pdf-container');
         if (!container) return;
         const containerHeight = container.clientHeight;
@@ -85,13 +88,7 @@
 
 <h1>{currentTab}</h1>
 {#if data.pdfData}
-    <object 
-    data={data.pdfData} 
-    type="application/pdf" 
-    width="100%" 
-    height="800px" style="display: none;">
-    <p>Unable to display PDF</p>
-    </object>
+ 
 
 <embed src={data.pdfData} width="100%" height="800px" type="application/pdf" style="display: none;">
 
@@ -110,7 +107,19 @@
 <div 
 	 class="show active tab-pane fade" id="pdf-tab-pane" role="tabpanel" aria-labelledby="pdf-tab" tabindex="0" style="height: 100vh">
     {#if data.pdfData}
-    <iframe src={data.pdfData} width="100%" height="100%" frameborder="0"></iframe>
+    <!-- <iframe src={data.pdfData} width="100%" height="100%" frameborder="0"></iframe> -->
+    <object 
+    data={data.pdfData} 
+    type="application/pdf" 
+    width="100%" 
+    height="100%">
+
+        <div class="text-center" style="padding-top: 100px;">
+            <p><a href={data.pdfUrl} target="_blank">ޕީޑީއެފް ފައިލް ޑައުންލޯޑް ކުރައްވާ</a></p>
+        </div>
+    </object>
+
+
     {/if}
 </div>
 {/if}
@@ -132,3 +141,20 @@
         <h1>No file specified</h1>
     </div>
 {/if}
+
+
+<style>
+    #pdf-container {
+      overflow-y: auto;
+      height: 100vh;
+      width: 100%;
+      border: 1px solid #000;
+    }
+    .pdf-page {
+      margin-bottom: 10px;
+    }
+    canvas {
+      width: 100%;
+    }
+
+</style>
