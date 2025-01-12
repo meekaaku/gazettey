@@ -17,7 +17,7 @@ export async function POST({ url, request }) {
     
     try {
         const results = await search(q);
-        return json({message: 'Gor results from typesnse', results: results});
+        return json({message: 'Gor results from typesnse' });
         return json(results);
     }
     catch(error: any) {

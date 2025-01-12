@@ -126,7 +126,6 @@ export async function search(q: string) {
         host: process.env.TYPESENSE_HOST,
         path: process.env.TYPESENSE_PATH,
         apiKey: process.env.TYPESENSE_ADMIN_KEY,
-        tss: tss
     }
     const searchParams = {  
         q: q,
