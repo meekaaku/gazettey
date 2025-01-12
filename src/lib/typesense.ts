@@ -16,13 +16,6 @@ const tss = new Typesense.Client({
     'connectionTimeoutSeconds': 2
 });
 
-console.log({
-    'host': process.env.TYPESENSE_HOST,
-    'port': process.env.TYPESENSE_PORT,
-    'path': process.env.TYPESENSE_PATH,
-    'apiKey': process.env.TYPESENSE_ADMIN_KEY,
-})
-
 function log(message: string) {
     console.log(message);
 }
