@@ -83,7 +83,6 @@
         const input = event.data;
         const _thaanaValue = thaanaValue;
         thaanaValue = latinToThaana(thaanaValue);
-        console.log({_thaanaValue,thaanaValue});
     }
 
 
@@ -118,6 +117,8 @@
           type="search" 
           class="form-control form-control-lg" 
           placeholder="ހޯދާލަދީބަލަ..."
+          autocorrect="off"
+          autocapitalize="off"
           bind:value={thaanaValue}
           oninput={handleKeyInput}
           dir="rtl"
@@ -132,10 +133,10 @@
       {#if tsResult && tsResult.found > 0}
             <div class="row">
                 {#each tsResult.hits as hit}
-                <div class="col-6 col-sm-6 col-md-4 col-xl-3 outer">
+                <div class="col-12 col-sm-6 col-md-4 col-xl-3 outer">
                     <div class="inner shadow">
-                    <a href={`/view?file=${hit.document.file_url}`}>
-                    <img src={`https://haley.sgp1.cdn.digitaloceanspaces.com/gazettey/${hit.document.filename.replace('.pdf','_1.jpg')}`} class="img-fluid" alt="Gazzete Image">
+                    <a href={`/view?file=${hit.document.file_url}`} target="_blank">
+                    <img src={`https://haley.sgp1.cdn.digitaloceanspaces.com/gazettey/${hit.document.filename.replace('.pdf','_1.jpg')}`} class="img-fluid" alt="Gazzete">
                     </a>
                     </div>
                 </div>

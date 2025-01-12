@@ -133,7 +133,7 @@ export async function search(q: string) {
         q: q,
         query_by: 'content',
         index: 'gazette',
-        per_page: 100,
+        per_page: 50,
         exclude_fields: 'content'
     }
     const results = await tss.collections('gazette').documents().search(searchParams);

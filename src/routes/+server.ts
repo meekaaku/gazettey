@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
 
 export async function GET (){
-    return redirect(302, `/hello`);
+    return redirect(302, `/search`);
 };
