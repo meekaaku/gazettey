@@ -13,7 +13,8 @@ export async function load({ fetch, url }: any) {
             const pdfBase64 = Buffer.from(await pdfBlob.arrayBuffer()).toString('base64');
             return {
                 pdfData: `data:application/pdf;base64,${pdfBase64}`,
-                pdfUrl: pdfUrl
+                pdfUrl: pdfUrl,
+                id: id
             };
         }
       }

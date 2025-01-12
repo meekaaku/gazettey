@@ -4,29 +4,42 @@ import { pool } from '$lib/gazzete';
 
 export const prerender = false;
 
-export async function POST({ url, request }) {
+export async function GET({ url, request }) {
 
     try {
-        return json({message: 'Deprecated'});
 
-        const dbresult = await pool.query('SELECT * FROM documents WHERE content_en IS NULL LIMIT 3');
+        const id = url.searchParams.get('id');
+        const task = url.searchParams.get('task') || '';
+
+        if(!['summary_en', 'summary_dv', 'content_en'].includes(task)){
+            return json({message: 'Invalid task'}, {status: 400});
+        }
+
+        const dbresult = await pool.query('SELECT * FROM documents WHERE id = $1', [id]);
+        if(dbresult.rows.length == 0){
+            return json({message: 'Document not found'}, {status: 404});
+        }
+
+        const row = dbresult.rows[0];
+
+
+        if(row[task]){
+            const obj:any = {}
+            obj[task] = row[task];
+            console.log(`${task} already exists, so retreiving from db`);
+            return json(obj, {status: 200});
+        }
 
         for (const row of dbresult.rows) {
             // Split content into chunks
             const chunks = splitIntoChunks(row.content);
-            const content_en = [];
-            const summary_en = [];
-            const summary_dv = [];
+            const results= [];
 
             // Process each chunk
             let i = 1;
             for (const chunk of chunks) {
                 try {
-                    content_en.push(await processChunk(chunk, 'content_en'));
-                    summary_en.push(await processChunk(chunk, 'summary_en'));
-                    summary_dv.push(await processChunk(chunk, 'summary_dv'));
-                    console.log(`Processed ${row.id}, chunk ${i} of ${chunks.length}`);
-                    i++;
+                    results.push(await processChunk(chunk, task as any));
                 }
                 catch(e) {
                     console.error(`Error processing chunk ${i}:`, e);
@@ -34,14 +47,8 @@ export async function POST({ url, request }) {
             }
 
             // Combine results
-            const combinedContentEn = content_en.join(' ');
-            const combinedSummaryEn = summary_en.join(' ');
-            const combinedSummaryDv = summary_dv.join(' ');
+            const combined = results.join(' ');
 
-            // If there were multiple chunks, generate a final summary
-            let finalSummaryEn = combinedSummaryEn;
-            let finalSummaryDv = combinedSummaryDv;
-            let finalContentEn = combinedContentEn;
             /*
             if (chunks.length > 1) {
                 const summaryResponse = await fetch('https://api.anthropic.com/v1/messages', {
@@ -77,7 +84,10 @@ export async function POST({ url, request }) {
                 }
             });
             */
-            await pool.query('UPDATE documents SET content_en = $1, summary_en = $2, summary_dv = $3 WHERE id = $4', [finalContentEn, finalSummaryEn, finalSummaryDv, row.id]);
+            await pool.query(`UPDATE documents SET ${task} = $2 WHERE id = $1`, [id, combined]);
+            const obj:any = {}
+            obj[task] = combined;
+            return json(obj, {status: 200});
         }
         return json({message: 'Content summarised', status: 200});
     } catch (error: any) {

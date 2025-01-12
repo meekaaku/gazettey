@@ -6,6 +6,8 @@
     let pdfDoc: any;
     let currentPage = 1;
 
+    let summary_dv: string|null = $state(data.summary_dv);
+
 
     async function loadPdf() {
         currentTab = 'canvas';
@@ -37,28 +39,28 @@
         });
     }
 
-      function renderPage(pageNum: number) {
-        pdfDoc.getPage(pageNum).then(function(page: any) {
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-          const viewport = page.getViewport({ scale: 0.75 });
+    function renderPage(pageNum: number) {
+    pdfDoc.getPage(pageNum).then(function(page: any) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const viewport = page.getViewport({ scale: 0.75 });
 
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
 
-          // Append the canvas to the container
-          document.getElementById('pdf-container')?.appendChild(canvas);
+        // Append the canvas to the container
+        document.getElementById('pdf-container')?.appendChild(canvas);
 
-          // Render the page
-          page.render({
-            canvasContext: context,
-            viewport: viewport
-          });
+        // Render the page
+        page.render({
+        canvasContext: context,
+        viewport: viewport
         });
-      }
+    });
+    }
 
-      // Handle scrolling to load next pages dynamically
-      function onScroll() {
+    // Handle scrolling to load next pages dynamically
+    function onScroll() {
         console.log('onScroll');
         const container = document.getElementById('pdf-container');
         if (!container) return;
@@ -68,25 +70,31 @@
 
         // Load next page when the user scrolls near the bottom
         if (scrollTop + containerHeight >= totalHeight - 100) {
-          if (currentPage < pdfDoc.numPages) {
+            if (currentPage < pdfDoc.numPages) {
             currentPage++;
             renderPage(currentPage);
-          }
+            }
         }
 
         // Load previous page if the user scrolls to the top
         if (scrollTop <= 100 && currentPage > 1) {
-          currentPage--;
-          renderPage(currentPage);
+            currentPage--;
+            renderPage(currentPage);
         }
-      }
+    }
 
+    async function getAiHelp(task: string) {
+        currentTab = 'canvas';
+        const response = await fetch(`/api/aisummary?id=${data.id}&task=summary_dv`);
+        const taskData = await response.json();
+        summary_dv = taskData[task].replaceAll('\n', '<br>');
+        console.log({taskData});
+    }
 
 
 </script>
 
 
-<h1>{currentTab}</h1>
 {#if data.pdfData}
  
 
@@ -94,10 +102,10 @@
 
 <ul class="nav nav-tabs">
   <li class="nav-item">
-    <a class="nav-link"  class:active={currentTab == 'pdf'} aria-current="page" href="#" onclick={() => currentTab = 'pdf'}>PDF</a>
+    <a class="nav-link"  class:active={currentTab == 'pdf'} aria-current="page" href="#" onclick={() => currentTab = 'pdf'}>ޕީޑީއެފް</a>
   </li>
   <li class="nav-item active">
-    <a class="nav-link"  class:active={currentTab == 'canvas'} href="#" onclick={loadPdf}>Canvas</a>
+    <a class="nav-link"  class:active={currentTab == 'canvas'} href="#" onclick={() => currentTab = 'summary_dv'}>އޭ އައި ޚުލާސާ</a>
   </li>
 
 </ul>
@@ -124,10 +132,20 @@
 </div>
 {/if}
 
-{#if currentTab == 'canvas'}
+{#if currentTab == 'summary_dv'}
 <div class="show active tab-pane fade" id="pdf-tab-pane" role="tabpanel" aria-labelledby="pdf-tab" tabindex="0" style="height: 100vh">
-     <div id="pdf-container"></div>
+    {#if summary_dv}
+    <div class="text-center px-3 py-3">
+
+        <p style="text-direction: rtl; text-align: right;">{@html summary_dv}</p>
+    </div>
+    {:else}
+    <div class="text-center" style="padding-top: 100px;">
+        <button class="btn btn-primary" onclick={() => getAiHelp('summary_dv')}>އޭ އައި ޚުލާސާ</button>
+    </div>
+    {/if}
 </div>
+
 {/if}
 
 
