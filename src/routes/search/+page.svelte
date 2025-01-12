@@ -154,7 +154,7 @@
                 {#each tsResult.hits as hit}
                 <div class="col-12 col-sm-6 col-md-4 col-xl-3 outer">
                     <div class="inner shadow">
-                    <a href={`/view?file=${hit.document.file_url}`} target="_blank">
+                    <a href={`/view?id=${hit.document.id}`} target="_blank">
                     <img src={`https://haley.sgp1.cdn.digitaloceanspaces.com/gazettey/${hit.document.filename.replace('.pdf','_1.jpg')}`} class="img-fluid" alt="Gazzete">
                     </a>
                     </div>
