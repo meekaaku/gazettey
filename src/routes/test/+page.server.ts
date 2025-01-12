@@ -3,10 +3,10 @@ import { pool } from '$lib/gazzete';
 
 export async function load({ fetch, url }: any) {
 
-    const dbresult = await pool.query('SELECT 1+1 as answer');
-    const answer = dbresult.rows[0].answer;
+    //const dbresult = await pool.query('SELECT 1+1 as answer');
+    //const answer = dbresult.rows[0].answer;
 
-    return {message: 'Hello World', answer: answer};
+    return {message: 'Hello World'}
 
     const id = url.searchParams.get('id');
     if(!id){

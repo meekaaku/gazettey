@@ -5,3 +5,6 @@ let {data } = $props();
 
 
 <h1>Testing</h1>
+
+
+<p>{JSON.stringify(data)}</p>
