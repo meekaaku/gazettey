@@ -7,7 +7,7 @@
     let currentPage = 1;
 
     let summary_dv: string|null = $state(data.summary_dv);
-
+    let busy = $state(false);
 
     async function loadPdf() {
         currentTab = 'canvas';
@@ -84,11 +84,17 @@
     }
 
     async function getAiHelp(task: string) {
-        currentTab = 'canvas';
-        const response = await fetch(`/api/aisummary?id=${data.id}&task=summary_dv`);
-        const taskData = await response.json();
-        summary_dv = taskData[task].replaceAll('\n', '<br>');
-        console.log({taskData});
+    
+        try {
+            busy = true;
+            const response = await fetch(`/api/aisummary?id=${data.id}&task=summary_dv`);
+            const taskData = await response.json();
+            summary_dv = taskData[task].replaceAll('\n', '<br>');
+            busy = false;
+        }
+        catch (error: any) {
+            busy = false;
+        }
     }
 
 
@@ -105,7 +111,7 @@
     <a class="nav-link"  class:active={currentTab == 'pdf'} aria-current="page" href="#" onclick={() => currentTab = 'pdf'}>ޕީޑީއެފް</a>
   </li>
   <li class="nav-item active">
-    <a class="nav-link"  class:active={currentTab == 'canvas'} href="#" onclick={() => currentTab = 'summary_dv'}>އޭ އައި ޚުލާސާ</a>
+    <a class="nav-link"  class:active={currentTab == 'summary_dv'} href="#" onclick={() => currentTab = 'summary_dv'}>އޭ އައި ޚުލާސާ</a>
   </li>
 
 </ul>
@@ -141,7 +147,19 @@
     </div>
     {:else}
     <div class="text-center" style="padding-top: 100px;">
-        <button class="btn btn-primary" onclick={() => getAiHelp('summary_dv')}>އޭ އައި ޚުލާސާ</button>
+      {#if busy}
+        <div class="text-center text-muted">
+          <div class="spinner-border text-primary" role="status"></div>
+            <p>އޭ އައި ޚުލާސާ ތައްޔާރު ކުރަނީ</p>
+        </div>
+      {:else}
+       އޭއައި ޚުލާސާ އެއް ހޯއަދަވަން ތިރީގައި މިވާ ތަނައް ފިތާލާ 
+       <br /> 
+       <br /> 
+       <button class="btn btn-primary" onclick={() => getAiHelp('summary_dv')}>އޭ އައި ޚުލާސާ ތައްޔާރު ކުރޭ</button>
+      {/if}
+
+
     </div>
     {/if}
 </div>
