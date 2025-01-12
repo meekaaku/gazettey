@@ -8,7 +8,7 @@ import pkg from 'pg';
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
-import * as pdfParse from 'pdf-parse';
+import * as  pdfParse from 'pdf-parse';
 //const pdfParse = require('pdf-parse');
 
 dotenv.config();
@@ -70,8 +70,11 @@ async function createEmbedding(text:string) {
 
 async function extractTextFromPDF(filePath:string) {
   const dataBuffer = await readFile(filePath);
-  const data = await pdfParse(dataBuffer);
-  return data.text;
+
+  // UNCOMMENT THIS TO USE PDF PARSE
+  //const data = await pdfParse.default(dataBuffer);
+  //return data.text;
+  return 'sdfsdf';
 }
 
 export async function extractTextFromFile(filePath:string) {
