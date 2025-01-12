@@ -1,6 +1,7 @@
 // Install required packages:
 // bun add @xenova/transformers pg pdf-parse dotenv
 
+/* @ts-ignore */
 import pdf2img from 'pdf2img';
 import { promises as fs } from 'fs';
 import { pipeline } from '@xenova/transformers';
@@ -272,7 +273,7 @@ async function convertPdfPageToImage(inputPath:string, outputPath:string, option
 
         // Convert PDF page to image
         return new Promise((resolve, reject) => {
-            converter.convert(inputPath, (err, result) => {
+            converter.convert(inputPath, (err: any, result: any) => {
                 if (err) {
                     reject(err);
                     return;
@@ -327,7 +328,7 @@ async function main() {
             }
         );
         console.log('PDF page converted successfully!');
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error:', error.message);
     }
 }
