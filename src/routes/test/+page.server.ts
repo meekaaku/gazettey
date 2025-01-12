@@ -1,12 +1,27 @@
 import { error } from '@sveltejs/kit';
+import pkg from 'pg';
 //import { pool } from '$lib/gazzete';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+const { Pool } = pkg;
 export async function load({ fetch, url }: any) {
 
-    //const dbresult = await pool.query('SELECT 1+1 as answer');
-    //const answer = dbresult.rows[0].answer;
 
-    return {message: 'Hello World'}
+    const pool = new Pool({
+        user: process.env.POSTGRES_USER,
+        host: process.env.POSTGRES_HOST,
+        database: process.env.POSTGRES_DB,
+        password: process.env.POSTGRES_PASSWORD,
+        port: parseInt(process.env.POSTGRES_PORT || '5432'),
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+    const dbresult = await pool.query('SELECT 1+1 as answer');
+    const answer = dbresult.rows[0].answer;
+    return {message: 'Hello World', answer: answer}
 
     const id = url.searchParams.get('id');
     if(!id){
