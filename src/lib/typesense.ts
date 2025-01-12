@@ -1,6 +1,6 @@
 import Typesense from 'typesense';
 import fs  from 'fs';
-import  { pool } from './gazzete';
+//import  { pool } from './gazzete';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -27,7 +27,6 @@ function log(message: string) {
     console.log(message);
 }
 
-/*
 export function readJSON(filePath: string): any {
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     
@@ -96,7 +95,8 @@ export async function buildIndex()
         
         for(const offset of offsets){
             t0 = performance.now();
-            const documents = (await pool.query(`SELECT id, filename, file_url, content, link_url FROM documents LIMIT 100 OFFSET ${offset} `)).rows;
+            //const documents = (await pool.query(`SELECT id, filename, file_url, content, link_url FROM documents LIMIT 100 OFFSET ${offset} `)).rows;
+            const documents: any[] = [];
             t1 = performance.now();
             report.push(log(`[ ${Math.round(t1 - t0)}ms ] Retrieved ${documents.length} documents from database`));
 
@@ -118,7 +118,6 @@ export async function buildIndex()
     return
 
 }
-*/
 
 export async function search(q: string) {
 
