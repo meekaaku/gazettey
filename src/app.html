@@ -6,8 +6,27 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
 		  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+
+
+		<style>
+			@font-face {
+				font-family: 'Thaana';
+				src: url('/MV_Waheed.otf') format('opentype');
+				font-weight: normal;
+				font-style: normal;
+				font-display: swap;
+			}
+
+			body {
+				font-family: 'Thaana', sans-serif;
+			}
+
+			.thaana  {
+				font-family: 'Thaana', sans-serif;
+			}
+    	</style>
 	</head>
-	<body data-sveltekit-preload-data="hover">
+	<body data-sveltekit-preload-data="hover" class="thaana">
 		    <script>
 		    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 			</script>

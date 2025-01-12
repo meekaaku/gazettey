@@ -109,6 +109,7 @@
     <div class="col-12 col-md-8 col-lg-6">
         <form onsubmit={handleSearch}>
       <div class="input-group">
+
         <button 
           class="btn btn-primary btn-lg" 
           type="submit"
