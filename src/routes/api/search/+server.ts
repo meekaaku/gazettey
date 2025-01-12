@@ -5,7 +5,6 @@ export const prerender = false;
 
 export async function POST({ url, request }) {
     //const q = url.searchParams.get('q') ?? null;
-    return json({message: 'dummy results', results: {}});
     const body = await request.json();
     const q = body.q ?? null;
 
