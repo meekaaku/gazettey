@@ -8,8 +8,8 @@ import pkg from 'pg';
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
-//import * as pdfParse from 'pdf-parse';
-const pdfParse = require('pdf-parse');
+import * as pdfParse from 'pdf-parse';
+//const pdfParse = require('pdf-parse');
 
 dotenv.config();
 
