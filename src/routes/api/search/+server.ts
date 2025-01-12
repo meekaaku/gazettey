@@ -1,5 +1,5 @@
 import { json, error } from '@sveltejs/kit';
-import { search } from '$lib/typesense';
+//import { search } from '$lib/typesense';
 
 export const prerender = false;
 
