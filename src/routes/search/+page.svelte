@@ -13,7 +13,7 @@
         try {
             tsResult = null;
             busy = true;
-            const response = await fetch(`/api/search`, {method: 'POST', body: JSON.stringify({q: thaanaValue})});
+            const response = await fetch(`/gazettey/api/search`, {method: 'POST', body: JSON.stringify({q: thaanaValue})});
             tsResult = await response.json();
             busy = false;
             console.log(tsResult);
