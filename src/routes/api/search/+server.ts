@@ -16,6 +16,7 @@ export async function POST({ url, request }) {
 
     
     try {
+        return json({message: 'dummy results', results: {}});
         const results = await search(q);
         //return json({message: 'dummy results', results: results});
         return json(results);
