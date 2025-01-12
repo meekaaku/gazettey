@@ -5,16 +5,23 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const tss = new Typesense.Client({
-    'nodes': [{
-        'host': process.env.TYPESENSE_HOST || 'localhost',
-        'port': Number(process.env.TYPESENSE_PORT) || 3000,      // For Typesense Cloud use 443
-        'protocol': 'https',   // For Typesense Cloud use https
-        'path': process.env.TYPESENSE_PATH || ''
-    }],
-    'apiKey': process.env.TYPESENSE_ADMIN_KEY || '',
-    'connectionTimeoutSeconds': 2
-});
+let tss: any;
+
+try {
+    tss = new Typesense.Client({
+        'nodes': [{
+            'host': process.env.TYPESENSE_HOST || 'localhost',
+            'port': Number(process.env.TYPESENSE_PORT) || 3000,      // For Typesense Cloud use 443
+            'protocol': 'https',   // For Typesense Cloud use https
+            'path': process.env.TYPESENSE_PATH || ''
+        }],
+        'apiKey': process.env.TYPESENSE_ADMIN_KEY || '',
+        'connectionTimeoutSeconds': 2
+    });
+    }
+catch(error: any) {
+    tss = 'Unale to initialise';
+}
 
 function log(message: string) {
     console.log(message);
@@ -119,6 +126,7 @@ export async function search(q: string) {
         host: process.env.TYPESENSE_HOST,
         path: process.env.TYPESENSE_PATH,
         apiKey: process.env.TYPESENSE_ADMIN_KEY,
+        tss: tss
     }
     const searchParams = {  
         q: q,
