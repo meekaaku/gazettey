@@ -27,6 +27,7 @@ function log(message: string) {
     console.log(message);
 }
 
+/*
 export function readJSON(filePath: string): any {
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     
@@ -117,7 +118,7 @@ export async function buildIndex()
     return
 
 }
-
+*/
 
 export async function search(q: string) {
 
