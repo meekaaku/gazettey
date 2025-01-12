@@ -101,6 +101,7 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
   <h1 class="text-center">ގެޒެޓޭ</h1>
+  <p class="text-center">ސަރުކާރު ގެޒެޓް އަވަސް ކޮށް ހޯދާ އޭއައި ޚުލާސާ ކިޔާލުމަށް</p>
   </div>
   <!-- Search Section -->
 
