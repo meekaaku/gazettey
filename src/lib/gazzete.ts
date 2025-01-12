@@ -15,6 +15,8 @@ dotenv.config();
 
 // PostgreSQL configuration
 const { Pool } = pkg;
+export const pool = '';
+/*
 export const pool = new Pool({
   user: process.env.POSTGRES_USER,
   host: process.env.POSTGRES_HOST,
@@ -25,6 +27,7 @@ export const pool = new Pool({
     rejectUnauthorized: false
   }
 });
+*/
 
 // Initialize the embedding pipeline
 let embedder:any = null;
