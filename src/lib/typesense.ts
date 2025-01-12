@@ -113,6 +113,13 @@ export async function buildIndex()
 
 
 export async function search(q: string) {
+
+    return {
+        port: process.env.TYPESENSE_PORT,
+        host: process.env.TYPESENSE_HOST,
+        path: process.env.TYPESENSE_PATH,
+        apiKey: process.env.TYPESENSE_ADMIN_KEY,
+    }
     const searchParams = {  
         q: q,
         query_by: 'content',
