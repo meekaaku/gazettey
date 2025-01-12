@@ -5,11 +5,11 @@ import pdf2img from 'pdf2img';
 import { promises as fs } from 'fs';
 import { pipeline } from '@xenova/transformers';
 import pkg from 'pg';
-import * as pdfParse from 'pdf-parse';
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
-import { POSTGRES_PASSWORD} from '$env/static/private';
+//import * as pdfParse from 'pdf-parse';
+const pdfParse = require('pdf-parse');
 
 dotenv.config();
 
@@ -70,7 +70,7 @@ async function createEmbedding(text:string) {
 
 async function extractTextFromPDF(filePath:string) {
   const dataBuffer = await readFile(filePath);
-  const data = await pdfParse.default(dataBuffer);
+  const data = await pdfParse(dataBuffer);
   return data.text;
 }
 
