@@ -5,17 +5,21 @@
 
     let thaanaValue = $state('');
     let tsResult = $state<any|null>({});
+    let busy = $state(false);
 
 
     async function handleSearch(event: any) {
         event.preventDefault();
         try {
             tsResult = null;
+            busy = true;
             const response = await fetch(`/api/search`, {method: 'POST', body: JSON.stringify({q: thaanaValue})});
             tsResult = await response.json();
+            busy = false;
             console.log(tsResult);
         }
         catch(error: any){
+            busy = false;
             console.error(error);
         }
 
@@ -129,8 +133,23 @@
   </div>
   <!-- Results Section -->
   <div class="row justify-content-center">
-    <div class="col-12 col-md-8">
+    <div class="col-12 col-md-12">
+      {#if busy}
+        <div class="text-center text-muted">
+          <div class="spinner-border text-primary" role="status"></div>
+            <p>ހޯދަނީ</p>
+        </div>
+      {/if}
+
       {#if tsResult && tsResult.found > 0}
+
+        <div class="text-center text-muted">
+          <p style="text-direction: rtl;">
+            ގެޒެޓް ފެނުނު އަދަދު {tsResult.found}
+           ތިރީގައި މިވަނީ {tsResult.hits.length} </p>
+        </div>
+
+
             <div class="row">
                 {#each tsResult.hits as hit}
                 <div class="col-12 col-sm-6 col-md-4 col-xl-3 outer">
@@ -143,7 +162,7 @@
 
                 {/each}
             </div>
-      {:else}
+      {:else if tsResult && tsResult.found == 0}
         <div class="text-center text-muted">
           <p>އެއްވެސް ނަތީޖާއެް ނުފެނުނު</p>
         </div>
@@ -160,4 +179,25 @@
     .inner{
         border: 1px solid #ccc;
     }
+
+.outer {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.outer:hover {
+    transform: scale(1.1); /* Raises the image */
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a shadow effect */
+}
+
+.inner {
+    transition: transform 0.3s ease;
+}
+
+.outer:hover .inner {
+    transform: scale(1.05); /* Slightly enlarge the inner content on hover */
+}
+
 </style>
