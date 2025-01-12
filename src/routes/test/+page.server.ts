@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { pool } from '$lib/gazzete';
+//import { pool } from '$lib/gazzete';
 
 export async function load({ fetch, url }: any) {
 
