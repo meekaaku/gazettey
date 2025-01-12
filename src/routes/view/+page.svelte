@@ -79,7 +79,7 @@
     
         try {
             busy = true;
-            const response = await fetch(`/gazettey/api/aisummary?id=${data.id}&task=summary_dv`);
+            const response = await fetch(`/api/aisummary?id=${data.id}&task=summary_dv`);
             const taskData = await response.json();
             summary_dv = taskData[task].replaceAll('\n', '<br>');
             busy = false;
