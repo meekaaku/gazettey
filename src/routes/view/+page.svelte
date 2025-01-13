@@ -96,8 +96,7 @@
 {#if data.pdfData}
  
 
-<embed src={data.pdfData} width="100%" height="800px" type="application/pdf" style="display: none;">
-
+<div class="container py-3">
 <ul class="nav nav-tabs">
   <li class="nav-item">
     <a class="nav-link"  class:active={currentTab == 'pdf'} aria-current="page" href="#" onclick={() => currentTab = 'pdf'}>ޕީޑީއެފް</a>
@@ -107,8 +106,7 @@
   </li>
 
 </ul>
-
-
+</div>
 {#if currentTab == 'pdf'}
 <div 
 	 class="show active tab-pane fade" id="pdf-tab-pane" role="tabpanel" aria-labelledby="pdf-tab" tabindex="0" style="height: 100vh">
@@ -131,7 +129,7 @@
 {/if}
 
 {#if currentTab == 'summary_dv'}
-<div class="show active tab-pane fade" id="pdf-tab-pane" role="tabpanel" aria-labelledby="pdf-tab" tabindex="0" style="height: 100vh">
+<div class="show active tab-pane fade " id="pdf-tab-pane" role="tabpanel" aria-labelledby="pdf-tab" tabindex="0" style="height: 100vh">
     {#if summary_dv}
     <div class="text-center px-3 py-3">
 
