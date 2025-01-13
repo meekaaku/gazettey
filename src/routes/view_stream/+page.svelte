@@ -10,78 +10,16 @@
     let busy = $state(false);
 
 
-    /*
-    async function loadPdf() {
-        currentTab = 'canvas';
-        pdfjsLib.getDocument(data.pdfData).promise.then(function(pdf: any) {
-            pdfDoc = pdf;
-            renderPage(1);  // Initially render the first page
-            renderPage(2)
-            currentPage = 2;
-
-            const pdfContainer = document.getElementById('pdf-container');
-            pdfContainer?.addEventListener('scroll', onScroll);
-
-            
-        });
-    }
-    */
-
-    /*
-    function renderPage(pageNum: number) {
-    pdfDoc.getPage(pageNum).then(function(page: any) {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        const viewport = page.getViewport({ scale: 0.75 });
-
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        // Append the canvas to the container
-        document.getElementById('pdf-container')?.appendChild(canvas);
-
-        // Render the page
-        page.render({
-        canvasContext: context,
-        viewport: viewport
-        });
-    });
-    }
-    */
-
-    // Handle scrolling to load next pages dynamically
-    /*
-    function onScroll() {
-        console.log('onScroll');
-        const container = document.getElementById('pdf-container');
-        if (!container) return;
-        const containerHeight = container.clientHeight;
-        const scrollTop = container.scrollTop;
-        const totalHeight = container.scrollHeight;
-
-        // Load next page when the user scrolls near the bottom
-        if (scrollTop + containerHeight >= totalHeight - 100) {
-            if (currentPage < pdfDoc.numPages) {
-            currentPage++;
-            renderPage(currentPage);
-            }
-        }
-
-        // Load previous page if the user scrolls to the top
-        if (scrollTop <= 100 && currentPage > 1) {
-            currentPage--;
-            renderPage(currentPage);
-        }
-    }
-        */
 
     async function getAiHelp(task: string) {
     
         try {
             busy = true;
-            const response = await fetch(`/api/aisummary?id=${data.id}&task=summary_dv`);
-            const taskData = await response.json();
-            summary_dv = taskData[task].replaceAll('\n', '<br>');
+            const response = await fetch(`/api/summary_stream?id=${data.id}&task=summary_dv`);
+            
+            const { response: fullResponse } = await response.json();
+            summary_dv = fullResponse.replaceAll('\n', '<br>');
+
             busy = false;
         }
         catch (error: any) {

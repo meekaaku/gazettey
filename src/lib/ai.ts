@@ -56,7 +56,7 @@ export async function processChunk(chunk:string, output: 'content_en' | 'summary
                 role: 'user',
                 content: `${prompt}${chunk}`
             }],
-            model: 'claude-3-sonnet-20240229',
+            model: 'claude-3-5-sonnet-20241022',
             max_tokens: 1024
         })
     });
