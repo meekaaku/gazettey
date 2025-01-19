@@ -2,9 +2,10 @@
 
 Full text search and AI summarise of Maldivian gazette. 
 
-## Creating a project
 
-If you're seeing this, you've probably already done this step. Congrats!
+
+##  Cloning the project
+
 
 ```bash
 # clone the repo
@@ -12,6 +13,12 @@ git clone https://github.com/meekaaku/gazzetey.git
 
 # Rename .env.sample to .env and fill in the values
 mv .env.sample .env
+
+# Install dependencies
+npm install
+
+# Download pdfs from urls.txt
+wget -P <path to documents> -i urls.txt
 ```
 
 ## Developing
