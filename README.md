@@ -43,3 +43,28 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+
+## How it works roughly
+
+1. After install, download the  pdf files from urls.txt and save to DOCUMENTS_FOLDER. /admin path is for admin tasks. 
+
+2. Extract first page of pdf as image and save to image folder.  Then upload these to a CDN for faster loading. 
+
+3. Extract pdf text and save to db.
+
+4. Build typesense index 
+
+4. When user searches, use typesense to get search result, show the first page of pdf image that was extracted 
+
+5. When AI summarise requested, chunk the text and use Claude to summarise. Save the summary to db so next time you dont need to call Claude. 
+
+
+## TODO
+
+1. AI summary streaming
+
+2. Chat with the the database
+
+
+
