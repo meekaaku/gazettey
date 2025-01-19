@@ -1,17 +1,17 @@
-# sv
+# Gazettey 
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Full text search and AI summarise of Maldivian gazette. 
 
 ## Creating a project
 
 If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
-# create a new project in the current directory
-npx sv create
+# clone the repo
+git clone https://github.com/meekaaku/gazzetey.git
 
-# create a new project in my-app
-npx sv create my-app
+# Rename .env.sample to .env and fill in the values
+mv .env.sample .env
 ```
 
 ## Developing
